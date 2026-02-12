@@ -1,0 +1,7 @@
+{
+  "name": "Copy of OmniPresence - AI Smart Attendance",
+  "description": "A production-grade attendance tracking system featuring face recognition, dynamic QR codes, and advanced teacher/admin analytics.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
