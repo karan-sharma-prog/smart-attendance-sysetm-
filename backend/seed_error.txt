@@ -1,0 +1,19 @@
+{
+  "stack": "MongoServerError: not primary\n    at Connection.sendCommand (C:\\Users\\bhavy\\OneDrive\\Documents\\GitHub\\smart-attendance-sysetm-\\backend\\node_modules\\mongodb\\src\\cmap\\connection.ts:557:17)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async Connection.command (C:\\Users\\bhavy\\OneDrive\\Documents\\GitHub\\smart-attendance-sysetm-\\backend\\node_modules\\mongodb\\src\\cmap\\connection.ts:627:22)\n    at async Server.command (C:\\Users\\bhavy\\OneDrive\\Documents\\GitHub\\smart-attendance-sysetm-\\backend\\node_modules\\mongodb\\src\\sdam\\server.ts:350:21)\n    at async tryOperation (C:\\Users\\bhavy\\OneDrive\\Documents\\GitHub\\smart-attendance-sysetm-\\backend\\node_modules\\mongodb\\src\\operations\\execute_operation.ts:293:24)\n    at async executeOperation (C:\\Users\\bhavy\\OneDrive\\Documents\\GitHub\\smart-attendance-sysetm-\\backend\\node_modules\\mongodb\\src\\operations\\execute_operation.ts:123:12)\n    at async Collection.deleteMany (C:\\Users\\bhavy\\OneDrive\\Documents\\GitHub\\smart-attendance-sysetm-\\backend\\node_modules\\mongodb\\src\\collection.ts:482:12)\n    at async model.Query.exec (C:\\Users\\bhavy\\OneDrive\\Documents\\GitHub\\smart-attendance-sysetm-\\backend\\node_modules\\mongoose\\lib\\query.js:4687:63)\n    at async seed (C:\\Users\\bhavy\\OneDrive\\Documents\\GitHub\\smart-attendance-sysetm-\\backend\\debug_seed.ts:17:9)",
+  "message": "not primary",
+  "errorLabelSet": {},
+  "errorResponse": {
+    "topologyVersion": {},
+    "ok": 0,
+    "code": 10107,
+    "codeName": "NotWritablePrimary",
+    "$clusterTime": {},
+    "operationTime": {}
+  },
+  "topologyVersion": {},
+  "ok": 0,
+  "code": 10107,
+  "codeName": "NotWritablePrimary",
+  "$clusterTime": {},
+  "operationTime": {}
+}

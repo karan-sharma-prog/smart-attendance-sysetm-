@@ -1,14 +1,35 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { dashboard } from '../src/api';
+import { toast } from 'react-hot-toast';
 
 const AdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'STUDENTS' | 'TEACHERS' | 'CLASSES'>('OVERVIEW');
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { data } = await dashboard.getAdmin();
+        setData(data);
+      } catch (err) {
+        toast.error('Failed to load dashboard data');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (loading) return <div className="p-8">Loading dashboard...</div>;
+  if (!data) return <div className="p-8">Error loading data.</div>;
 
   const stats = [
-    { label: 'Total Enrollment', value: '1,240', change: '+12%', icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z' },
-    { label: 'Total Staff', value: '84', change: '+2', icon: 'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' },
+    { label: 'Total Enrollment', value: data.stats.totalEnrollment, change: '+12%', icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z' },
+    { label: 'Total Staff', value: data.stats.totalStaff, change: '+2', icon: 'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' },
     { label: 'Avg Attendance', value: '94.2%', change: '+1.4%', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
-    { label: 'Active Classes', value: '42', change: 'Stable', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' },
+    { label: 'Active Classes', value: data.stats.activeClasses, change: 'Stable', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' },
   ];
 
   return (
@@ -78,12 +99,7 @@ const AdminDashboard: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50 text-sm">
-                  {[
-                    { name: 'Alice Thompson', email: 'alice@edu.com', role: 'STUDENT', date: 'Oct 12, 2024' },
-                    { name: 'Dr. Robert King', email: 'r.king@edu.com', role: 'TEACHER', date: 'Oct 10, 2024' },
-                    { name: 'Sam Wilson', email: 'sam.w@edu.com', role: 'STUDENT', date: 'Oct 09, 2024' },
-                    { name: 'Prof. Helen Mirren', email: 'helen@edu.com', role: 'TEACHER', date: 'Oct 08, 2024' },
-                  ].map((u, i) => (
+                  {data.recentUsers.map((u: any, i: number) => (
                     <tr key={i} className="hover:bg-slate-50/30">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
@@ -101,7 +117,7 @@ const AdminDashboard: React.FC = () => {
                           {u.role}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-slate-500">{u.date}</td>
+                      <td className="px-6 py-4 text-slate-500">Oct 12, 2024</td>
                       <td className="px-6 py-4 text-right">
                         <button className="p-1.5 text-slate-400 hover:text-emerald-600 transition-all">
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -121,11 +137,7 @@ const AdminDashboard: React.FC = () => {
           <div className="glass-card p-6 rounded-2xl shadow-sm border border-slate-100">
             <h3 className="font-bold text-slate-900 mb-6">Class Assignment</h3>
             <div className="space-y-4">
-              {[
-                { name: 'CS-402', teacher: 'Dr. King', students: 32 },
-                { name: 'MAT-101', teacher: 'Prof. Mirren', students: 45 },
-                { name: 'PHYS-202', teacher: 'Dr. King', students: 28 },
-              ].map((c, i) => (
+              {data.classes.map((c: any, i: number) => (
                 <div key={i} className="p-4 rounded-xl border border-slate-100 bg-slate-50/50">
                   <div className="flex justify-between items-center mb-1">
                     <span className="font-bold text-slate-900">{c.name}</span>

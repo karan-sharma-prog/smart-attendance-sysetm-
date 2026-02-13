@@ -1,6 +1,8 @@
 
 import React, { useState } from 'react';
 import { User, UserRole } from '../types';
+import { auth, misc } from '../src/api';
+import { toast } from 'react-hot-toast';
 
 interface LoginPageProps {
   onLogin: (user: User) => void;
@@ -12,25 +14,37 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   const [role, setRole] = useState<UserRole>(UserRole.STUDENT);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulated API call delay
-    setTimeout(() => {
-      // Mock validation logic
-      const mockUser: User = {
-        id: Math.random().toString(36).substr(2, 9),
-        name: email.split('@')[0].split('.').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' '),
-        email,
-        role,
-        classId: role !== UserRole.ADMIN ? 'CLASS-101' : undefined,
-        attendancePercentage: role === UserRole.STUDENT ? Math.floor(Math.random() * 40) + 60 : undefined
+    try {
+      const { data } = await auth.login(email, password);
+      localStorage.setItem('omni_token', data.token); // Store JWT
+
+      // Map backend user to frontend User type if needed, 
+      // or ensure backend sends compatible structure.
+      const user: User = {
+        ...data.user,
+        // role might need mapping if enum case differs, but backend uses uppercase too
       };
-      
-      onLogin(mockUser);
+
+      onLogin(user);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.response?.data || 'Login failed');
+    } finally {
       setIsLoading(false);
-    }, 800);
+    }
+  };
+
+  const handleSeed = async () => {
+    try {
+      await misc.seed();
+      toast.success("Database seeded with sample data!");
+    } catch (err) {
+      toast.error("Failed to seed database");
+    }
   };
 
   return (
@@ -43,7 +57,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
             The next generation of attendance tracking powered by AI. Seamless, secure, and smart.
           </p>
         </div>
-        
+
         <div className="space-y-8">
           <div className="flex items-center gap-4">
             <div className="bg-white/10 p-3 rounded-lg backdrop-blur-md">
@@ -57,7 +71,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
               <p className="text-sm text-emerald-100">Zero-touch biometric attendance marking.</p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-4">
             <div className="bg-white/10 p-3 rounded-lg backdrop-blur-md">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -85,6 +99,10 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="p-4 bg-blue-50 text-blue-800 text-sm rounded-lg mb-4 cursor-pointer" onClick={handleSeed}>
+              ℹ️ <strong>Dev Mode:</strong> Click here to seed database with demo accounts (password: password123)
+            </div>
+
             <div className="space-y-2">
               <label className="text-sm font-semibold text-slate-700">Account Type</label>
               <div className="grid grid-cols-3 gap-3">
@@ -142,8 +160,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
           </form>
 
           <div className="mt-8 pt-8 border-t border-slate-100 flex justify-between text-sm text-slate-500">
-            <span>Admin: admin@test.com</span>
-            <span>Teacher: teacher@test.com</span>
+            <span>Admin: admin@edu.com</span>
+            <span>Teacher: teacher@edu.com</span>
           </div>
         </div>
       </div>
